@@ -4,8 +4,9 @@ spring:
   application:
     name: goods
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://192.168.211.132:3306/changgou_goods?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 设置 jdbc 连接串 useSSL=false 解决 Bad handshake 问题 https://opensource.actionsky.com/20200514-mysql/
+    url: jdbc:mysql://192.168.211.132:3306/changgou_goods?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
     username: root
     password: 123456
 eureka:
