@@ -1,8 +1,8 @@
 package com.changgou.goods.controller;
 
 import com.changgou.core.AbstractCoreController;
-import com.changgou.goods.pojo.Brand;
-import com.changgou.goods.service.BrandService;
+import com.changgou.goods.pojo.Sku;
+import com.changgou.goods.service.SkuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,15 +15,15 @@ import org.springframework.web.bind.annotation.RestController;
  *****/
 
 @RestController
-@RequestMapping("/brand")
+@RequestMapping("/sku")
 @CrossOrigin
-public class BrandController extends AbstractCoreController<Brand>{
+public class SkuController extends AbstractCoreController<Sku>{
 
-    private BrandService  brandService;
+    private SkuService  skuService;
 
     @Autowired
-    public BrandController(BrandService  brandService) {
-        super(brandService, Brand.class);
-        this.brandService = brandService;
+    public SkuController(SkuService  skuService) {
+        super(skuService, Sku.class);
+        this.skuService = skuService;
     }
 }

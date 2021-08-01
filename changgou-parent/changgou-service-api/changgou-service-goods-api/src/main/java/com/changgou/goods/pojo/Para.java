@@ -5,28 +5,28 @@ import java.io.Serializable;
 
 /****
  * @Author:admin
- * @Description:Brand构建
+ * @Description:Para构建
  * @Date 2019/6/14 19:13
  *****/
-@Table(name="tb_brand")
-public class Brand implements Serializable{
+@Table(name="tb_para")
+public class Para implements Serializable{
 
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-	private Integer id;//品牌id
+	private Integer id;//id
 
     @Column(name = "name")
-	private String name;//品牌名称
+	private String name;//名称
 
-    @Column(name = "image")
-	private String image;//品牌图片地址
-
-    @Column(name = "letter")
-	private String letter;//品牌的首字母
+    @Column(name = "options")
+	private String options;//选项
 
     @Column(name = "seq")
 	private Integer seq;//排序
+
+    @Column(name = "template_id")
+	private Integer templateId;//模板ID
 
 
 
@@ -49,22 +49,13 @@ public class Brand implements Serializable{
 		this.name = name;
 	}
 	//get方法
-	public String getImage() {
-		return image;
+	public String getOptions() {
+		return options;
 	}
 
 	//set方法
-	public void setImage(String image) {
-		this.image = image;
-	}
-	//get方法
-	public String getLetter() {
-		return letter;
-	}
-
-	//set方法
-	public void setLetter(String letter) {
-		this.letter = letter;
+	public void setOptions(String options) {
+		this.options = options;
 	}
 	//get方法
 	public Integer getSeq() {
@@ -74,6 +65,15 @@ public class Brand implements Serializable{
 	//set方法
 	public void setSeq(Integer seq) {
 		this.seq = seq;
+	}
+	//get方法
+	public Integer getTemplateId() {
+		return templateId;
+	}
+
+	//set方法
+	public void setTemplateId(Integer templateId) {
+		this.templateId = templateId;
 	}
 
 
