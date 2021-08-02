@@ -3,6 +3,8 @@ package com.changgou.goods.service;
 import com.changgou.core.service.CoreService;
 import com.changgou.goods.pojo.Category;
 
+import java.util.List;
+
 /****
  * @Author:admin
  * @Description:Category业务层接口
@@ -10,4 +12,5 @@ import com.changgou.goods.pojo.Category;
  *****/
 public interface CategoryService extends CoreService<Category> {
 
+    List<Category> findByParentId(Integer pid);
 }

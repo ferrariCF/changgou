@@ -7,6 +7,8 @@ import com.changgou.goods.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /****
  * @Author:admin
  * @Description:Category业务层接口实现类
@@ -21,5 +23,10 @@ public class CategoryServiceImpl extends CoreServiceImpl<Category> implements Ca
     public CategoryServiceImpl(CategoryMapper categoryMapper) {
         super(categoryMapper, Category.class);
         this.categoryMapper = categoryMapper;
+    }
+
+    @Override
+    public List<Category> findByParentId(Integer pid) {
+        return categoryMapper.findByParentId(pid);
     }
 }

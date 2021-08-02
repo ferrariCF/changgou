@@ -1,6 +1,7 @@
 package com.changgou.goods.service;
 
 import com.changgou.core.service.CoreService;
+import com.changgou.goods.pojo.Goods;
 import com.changgou.goods.pojo.Spu;
 
 /****
@@ -10,4 +11,7 @@ import com.changgou.goods.pojo.Spu;
  *****/
 public interface SpuService extends CoreService<Spu> {
 
+    void save(Goods goods);
+
+    Goods findGoodsById(Long id);
 }

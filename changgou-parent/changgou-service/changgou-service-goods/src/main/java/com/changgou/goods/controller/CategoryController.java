@@ -3,10 +3,11 @@ package com.changgou.goods.controller;
 import com.changgou.core.AbstractCoreController;
 import com.changgou.goods.pojo.Category;
 import com.changgou.goods.service.CategoryService;
+import entity.Result;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /****
  * @Author:admin
@@ -25,5 +26,16 @@ public class CategoryController extends AbstractCoreController<Category>{
     public CategoryController(CategoryService  categoryService) {
         super(categoryService, Category.class);
         this.categoryService = categoryService;
+    }
+
+    /**
+     * 根据分类id 获取该分类下的直接子分类列表 当ID为0的时候表示获取一级分类列表
+     * @param pid
+     * @return
+     */
+    @GetMapping("/list/{pid}")
+    public Result<List<Category>> findByParentId(@PathVariable(name = "pid") Integer pid){
+        List<Category> categoryList = categoryService.findByParentId(pid);
+        return Result.ok(categoryList);
     }
 }

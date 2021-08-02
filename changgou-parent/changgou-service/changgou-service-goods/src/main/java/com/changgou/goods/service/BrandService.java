@@ -3,6 +3,8 @@ package com.changgou.goods.service;
 import com.changgou.core.service.CoreService;
 import com.changgou.goods.pojo.Brand;
 
+import java.util.List;
+
 /****
  * @Author:admin
  * @Description:Brand业务层接口
@@ -10,4 +12,5 @@ import com.changgou.goods.pojo.Brand;
  *****/
 public interface BrandService extends CoreService<Brand> {
 
+    List<Brand> findBrandByCategory(Integer id);
 }

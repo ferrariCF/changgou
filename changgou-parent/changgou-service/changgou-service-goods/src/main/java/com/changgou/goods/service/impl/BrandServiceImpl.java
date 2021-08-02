@@ -7,6 +7,8 @@ import com.changgou.goods.service.BrandService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /****
  * @Author:admin
  * @Description:Brand业务层接口实现类
@@ -21,5 +23,10 @@ public class BrandServiceImpl extends CoreServiceImpl<Brand> implements BrandSer
     public BrandServiceImpl(BrandMapper brandMapper) {
         super(brandMapper, Brand.class);
         this.brandMapper = brandMapper;
+    }
+
+    @Override
+    public List<Brand> findBrandByCategory(Integer id) {
+        return brandMapper.findBrandByCategory(id);
     }
 }

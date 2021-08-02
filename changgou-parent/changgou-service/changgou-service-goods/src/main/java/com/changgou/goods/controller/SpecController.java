@@ -3,10 +3,11 @@ package com.changgou.goods.controller;
 import com.changgou.core.AbstractCoreController;
 import com.changgou.goods.pojo.Spec;
 import com.changgou.goods.service.SpecService;
+import entity.Result;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /****
  * @Author:admin
@@ -25,5 +26,16 @@ public class SpecController extends AbstractCoreController<Spec>{
     public SpecController(SpecService  specService) {
         super(specService, Spec.class);
         this.specService = specService;
+    }
+
+    /**
+     * 根据三级分类 id 查询规格列表
+     * @param id
+     * @return
+     */
+    @GetMapping("/category/{id}")
+    public Result<List<Spec>> findByCategoryId(@PathVariable(name = "id") Integer id) {
+        List<Spec> specList = specService.findByCategoryId(id);
+        return Result.ok(specList);
     }
 }

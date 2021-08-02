@@ -3,6 +3,8 @@ package com.changgou.goods.service;
 import com.changgou.core.service.CoreService;
 import com.changgou.goods.pojo.Spec;
 
+import java.util.List;
+
 /****
  * @Author:admin
  * @Description:Spec业务层接口
@@ -10,4 +12,5 @@ import com.changgou.goods.pojo.Spec;
  *****/
 public interface SpecService extends CoreService<Spec> {
 
+    List<Spec> findByCategoryId(Integer id);
 }

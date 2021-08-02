@@ -3,10 +3,11 @@ package com.changgou.goods.controller;
 import com.changgou.core.AbstractCoreController;
 import com.changgou.goods.pojo.Brand;
 import com.changgou.goods.service.BrandService;
+import entity.Result;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /****
  * @Author:admin
@@ -25,5 +26,16 @@ public class BrandController extends AbstractCoreController<Brand>{
     public BrandController(BrandService  brandService) {
         super(brandService, Brand.class);
         this.brandService = brandService;
+    }
+
+    /**
+     * 根据三级分类 id 查询品牌列表
+     * @param id
+     * @return
+     */
+    @GetMapping("/category/{id}")
+    public Result<List<Brand>> findBrandByCategory(@PathVariable(name = "id") Integer id) {
+        List<Brand> brandList = brandService.findBrandByCategory(id);
+        return Result.ok(brandList);
     }
 }

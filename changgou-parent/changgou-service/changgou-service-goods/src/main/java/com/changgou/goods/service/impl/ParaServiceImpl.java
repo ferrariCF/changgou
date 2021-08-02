@@ -7,6 +7,8 @@ import com.changgou.goods.service.ParaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /****
  * @Author:admin
  * @Description:Para业务层接口实现类
@@ -21,5 +23,10 @@ public class ParaServiceImpl extends CoreServiceImpl<Para> implements ParaServic
     public ParaServiceImpl(ParaMapper paraMapper) {
         super(paraMapper, Para.class);
         this.paraMapper = paraMapper;
+    }
+
+    @Override
+    public List<Para> findByCategoryId(Integer id) {
+        return paraMapper.findByCategoryId(id);
     }
 }

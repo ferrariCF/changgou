@@ -3,6 +3,8 @@ package com.changgou.goods.service;
 import com.changgou.core.service.CoreService;
 import com.changgou.goods.pojo.Para;
 
+import java.util.List;
+
 /****
  * @Author:admin
  * @Description:Para业务层接口
@@ -10,4 +12,5 @@ import com.changgou.goods.pojo.Para;
  *****/
 public interface ParaService extends CoreService<Para> {
 
+    List<Para> findByCategoryId(Integer id);
 }
