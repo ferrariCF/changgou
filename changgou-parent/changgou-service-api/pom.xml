@@ -14,6 +14,7 @@
     <description>所有的api(pojo.feign)所在的工程的父工程 聚合工程 方便统一管理所有的pojo和feign</description>
     <modules>
         <module>changgou-service-goods-api</module>
+        <module>changgou-service-content-api</module>
     </modules>
 
     <dependencies>
@@ -23,6 +24,12 @@
             <artifactId>persistence-api</artifactId>
             <version>1.0</version>
             <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.changgou</groupId>
+            <artifactId>changgou-common</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
