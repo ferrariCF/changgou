@@ -18,10 +18,7 @@ import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilde
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author: lee
@@ -52,7 +49,7 @@ public class SkuServiceImpl implements SkuService {
         // 将 spec 映射到 specMap 中
         for (SkuInfo skuInfo : skuInfoList) {
             String spec = skuInfo.getSpec();
-            Map<String,Object> specMap = JSON.parseObject(spec, Map.class);
+            Map<String, Object> specMap = JSON.parseObject(spec, Map.class);
             skuInfo.setSpecMap(specMap);
         }
         skuEsMapper.saveAll(skuInfoList);
@@ -60,6 +57,7 @@ public class SkuServiceImpl implements SkuService {
 
     /**
      * 暂时只做关键字搜索
+     *
      * @param searchMap {"keywords":"手机"}
      * @return
      */
@@ -73,12 +71,15 @@ public class SkuServiceImpl implements SkuService {
         // 2. 创建查询对象的构建对象
         NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
         // 2.1 设置根据分类的分组查询条件
-        nativeSearchQueryBuilder.addAggregation(AggregationBuilders.terms("skuCategoryGroup").field("categoryName").size(100));
+        nativeSearchQueryBuilder.addAggregation(AggregationBuilders.terms("skuCategoryGroup").field("categoryName").size(10000));
         // 2.2 设置根据品牌的分组查询条件
-        nativeSearchQueryBuilder.addAggregation(AggregationBuilders.terms("skuBrandGroup").field("brandName").size(100));
+        nativeSearchQueryBuilder.addAggregation(AggregationBuilders.terms("skuBrandGroup").field("brandName").size(10000));
+        // 2.3 设置根据规格的分组查询条件
+        // 字段设置为: spec.keyword, 当搜索的时候实现分组查询的时候是不需要进行分词的
+        nativeSearchQueryBuilder.addAggregation(AggregationBuilders.terms("skuSpecGroup").field("spec.keyword").size(100000));
 
         // 3. 设置条件 匹配查询
-        nativeSearchQueryBuilder.withQuery(QueryBuilders.matchQuery("name",keywords));
+        nativeSearchQueryBuilder.withQuery(QueryBuilders.matchQuery("name", keywords));
         // 4. 构建查询对象
         SearchQuery query = nativeSearchQueryBuilder.build();
         // 5. 执行查询
@@ -94,20 +95,53 @@ public class SkuServiceImpl implements SkuService {
         List<String> categoryList = getGroupNameList(skuPage, "skuCategoryGroup");
         // 6.5 分组结果(品牌列表)
         List<String> brandList = getGroupNameList(skuPage, "skuBrandGroup");
+        // 6.6 获取规格列表和规格值列表 map:{"规格名1":[值1,值2]}
+        StringTerms stringTerms = (StringTerms) skuPage.getAggregation("skuSpecGroup");
+        Map<String, Set<String>> specMap = getSpecSetMap(stringTerms);
 
         // 封装到 Map 中
-        Map<String,Object> resultMap = new HashMap<>();
-        resultMap.put("rows",content);
-        resultMap.put("total",totalElements);
-        resultMap.put("totalPages",totalPages);
-        resultMap.put("categoryList",categoryList);
-        resultMap.put("brandList",brandList);
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("rows", content);
+        resultMap.put("total", totalElements);
+        resultMap.put("totalPages", totalPages);
+        resultMap.put("categoryList", categoryList);
+        resultMap.put("brandList", brandList);
+        resultMap.put("specMap", specMap);
         return resultMap;
     }
 
     /**
+     * 解析从 es 中获取的规格数据
+     * @param stringTerms
+     * @return Map<String, Set<String>> key 为规格名, set集合为该规格名下面的值
+     */
+    private Map<String, Set<String>> getSpecSetMap(StringTerms stringTerms) {
+        Map<String,Set<String>> specMap = new HashMap<>();
+
+        if (stringTerms != null) {
+            for (StringTerms.Bucket bucket : stringTerms.getBuckets()) {
+                Map<String,String> map = JSON.parseObject(bucket.getKeyAsString(), Map.class);
+                //{"手机屏幕尺寸":"5.5寸","网络":"电信4G","颜色":"白","测试":"s11","机身内存":"128G","存储":"16G","像素":"300万像素"}
+                //{"手机屏幕尺寸":"5.0寸","网络":"电信4G","颜色":"白","测试":"s11","机身内存":"128G","存储":"16G","像素":"300万像素"}
+                for (Map.Entry<String, String> entry : map.entrySet()) {
+                    String key = entry.getKey();
+                    String value = entry.getValue();
+                    Set<String> values = specMap.get(key);
+                    if (values == null) {
+                        values = new HashSet<>();
+                    }
+                    values.add(value);
+                    specMap.put(key,values);
+                }
+            }
+        }
+        return specMap;
+    }
+
+    /**
      * 获取组名的列表
-     * @param skuPage 查询结果
+     *
+     * @param skuPage  查询结果
      * @param skuGroup 分组查询的标识名
      * @return
      */
