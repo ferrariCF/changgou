@@ -12,6 +12,7 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,6 +86,12 @@ public class SkuServiceImpl implements SkuService {
         // 字段设置为: spec.keyword, 当搜索的时候实现分组查询的时候是不需要进行分词的
         nativeSearchQueryBuilder.addAggregation(AggregationBuilders.terms("skuSpecGroup").field("spec.keyword").size(100000));
 
+        // 2.4 高亮
+        // 设置高亮字段
+        nativeSearchQueryBuilder.withHighlightFields(new HighlightBuilder.Field("name"));
+        // 设置前后缀
+        nativeSearchQueryBuilder.withHighlightBuilder(new HighlightBuilder().preTags("<span style=\"color:red\">").postTags("</span>"));
+
         // 3. 设置条件 匹配查询
         nativeSearchQueryBuilder.withQuery(QueryBuilders.matchQuery("name", keywords));
         // 3.1 过滤查询
@@ -146,7 +153,7 @@ public class SkuServiceImpl implements SkuService {
         // 4. 构建查询对象
         SearchQuery query = nativeSearchQueryBuilder.build();
         // 5. 执行查询
-        AggregatedPage<SkuInfo> skuPage = esTemplate.queryForPage(query, SkuInfo.class);
+        AggregatedPage<SkuInfo> skuPage = esTemplate.queryForPage(query, SkuInfo.class, new SearchResultMapperImpl());
         // 6. 获取结果 封装返回
         // 6.1 当前页的记录
         List<SkuInfo> content = skuPage.getContent();
