@@ -93,7 +93,9 @@ public class SkuServiceImpl implements SkuService {
         nativeSearchQueryBuilder.withHighlightBuilder(new HighlightBuilder().preTags("<span style=\"color:red\">").postTags("</span>"));
 
         // 3. 设置条件 匹配查询
-        nativeSearchQueryBuilder.withQuery(QueryBuilders.matchQuery("name", keywords));
+        // nativeSearchQueryBuilder.withQuery(QueryBuilders.matchQuery("name", keywords));
+        // 多字段搜索
+        nativeSearchQueryBuilder.withQuery(QueryBuilders.multiMatchQuery(keywords, "name", "categoryName", "brandName"));
         // 3.1 过滤查询
         // 多条件组合查询
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
@@ -101,29 +103,29 @@ public class SkuServiceImpl implements SkuService {
         // 商品分类过滤
         String category = searchMap.get("category");
         if (!StringUtils.isEmpty(category)) {
-            boolQueryBuilder.filter(QueryBuilders.termQuery("categoryName",category));
+            boolQueryBuilder.filter(QueryBuilders.termQuery("categoryName", category));
         }
         // 商品品牌过滤
         String brand = searchMap.get("brand");
         if (!StringUtils.isEmpty(brand)) {
-            boolQueryBuilder.filter(QueryBuilders.termQuery("brandName",brand));
+            boolQueryBuilder.filter(QueryBuilders.termQuery("brandName", brand));
         }
         // 商品规格过滤
         for (Map.Entry<String, String> entry : searchMap.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
             if (key.startsWith("spec_")) {
-                boolQueryBuilder.filter(QueryBuilders.termQuery("specMap." + key.substring(5) + ".keyword",value));
+                boolQueryBuilder.filter(QueryBuilders.termQuery("specMap." + key.substring(5) + ".keyword", value));
             }
         }
         // 价格区间过滤(范围)
         String price = searchMap.get("price");
         if (!StringUtils.isEmpty(price)) {
             String[] split = price.split("-");
-            if ("*".equals(split[1])){
+            if ("*".equals(split[1])) {
                 // 3000元以上-->3000-*
                 boolQueryBuilder.filter(QueryBuilders.rangeQuery("price").gte(split[0]));
-            }else{
+            } else {
                 boolQueryBuilder.filter(QueryBuilders.rangeQuery("price").gte(split[0]).lte(split[1]));
             }
         }
@@ -138,7 +140,7 @@ public class SkuServiceImpl implements SkuService {
         }
         Integer size = 20;
         // 设置分页对象
-        Pageable pageable = PageRequest.of(pageNum - 1,size);
+        Pageable pageable = PageRequest.of(pageNum - 1, size);
         nativeSearchQueryBuilder.withPageable(pageable);
 
         // 3.3 设置排序
@@ -146,7 +148,7 @@ public class SkuServiceImpl implements SkuService {
         String sortField = searchMap.get("sortField");
         // 排序规则
         String sortRule = searchMap.get("sortRule");
-        if (!StringUtils.isEmpty(sortField) && !StringUtils.isEmpty(sortRule)){
+        if (!StringUtils.isEmpty(sortField) && !StringUtils.isEmpty(sortRule)) {
             nativeSearchQueryBuilder.withSort(SortBuilders.fieldSort(sortField).order(SortOrder.valueOf(sortRule)));
         }
 
@@ -182,15 +184,16 @@ public class SkuServiceImpl implements SkuService {
 
     /**
      * 解析从 es 中获取的规格数据
+     *
      * @param stringTerms
-     * @return Map<String, Set<String>> key 为规格名, set集合为该规格名下面的值
+     * @return Map<String, Set < String>> key 为规格名, set集合为该规格名下面的值
      */
     private Map<String, Set<String>> getSpecSetMap(StringTerms stringTerms) {
-        Map<String,Set<String>> specMap = new HashMap<>();
+        Map<String, Set<String>> specMap = new HashMap<>();
 
         if (stringTerms != null) {
             for (StringTerms.Bucket bucket : stringTerms.getBuckets()) {
-                Map<String,String> map = JSON.parseObject(bucket.getKeyAsString(), Map.class);
+                Map<String, String> map = JSON.parseObject(bucket.getKeyAsString(), Map.class);
                 //{"手机屏幕尺寸":"5.5寸","网络":"电信4G","颜色":"白","测试":"s11","机身内存":"128G","存储":"16G","像素":"300万像素"}
                 //{"手机屏幕尺寸":"5.0寸","网络":"电信4G","颜色":"白","测试":"s11","机身内存":"128G","存储":"16G","像素":"300万像素"}
                 for (Map.Entry<String, String> entry : map.entrySet()) {
@@ -201,7 +204,7 @@ public class SkuServiceImpl implements SkuService {
                         values = new HashSet<>();
                     }
                     values.add(value);
-                    specMap.put(key,values);
+                    specMap.put(key, values);
                 }
             }
         }

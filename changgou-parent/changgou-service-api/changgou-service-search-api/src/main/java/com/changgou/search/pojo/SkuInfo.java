@@ -1,5 +1,6 @@
 package com.changgou.search.pojo;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
@@ -17,6 +18,7 @@ import java.util.Map;
 public class SkuInfo implements Serializable {
     //商品id，同时也是商品编号
     @Id
+    @JsonSerialize(using = LongToStringSerializer.class)
     private Long id;
 
     //SKU名称
